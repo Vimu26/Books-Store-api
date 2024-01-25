@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Category } from 'src/types/common.types';
+import { ICategory } from 'src/types/common.types';
 
 @Schema({
   timestamps: true,
@@ -18,7 +18,7 @@ export class Book {
   price: number;
 
   @Prop()
-  category: Category;
+  category: ICategory;
 }
 
 export const BookSchema = SchemaFactory.createForClass(Book);

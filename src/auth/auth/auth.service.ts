@@ -6,10 +6,10 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../schemas/user.schema';
 import { Model } from 'mongoose';
-import * as bcrypt from 'bcryptjs';
 import { SignUpDto } from '../dtos/signUp.dto';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from '../dtos/login.dto';
+import { HashingService } from 'src/services/hashing/hashing.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +17,7 @@ export class AuthService {
     @InjectModel(User.name)
     private usersModel: Model<User>,
     private jwtService: JwtService,
+    private passwordHashingService: HashingService,
   ) {}
 
   async signUp(data: SignUpDto): Promise<{ user: SignUpDto }> {
@@ -29,15 +30,14 @@ export class AuthService {
     }
 
     // Hash the password
-    const saltRounds = 10;
-    const salt = await bcrypt.genSalt(saltRounds);
-    const hashPassword = await bcrypt.hash(password, salt);
+    const hashedPassword =
+      await this.passwordHashingService.hashPassword(password);
 
     // Create a new user
     const newUser = new this.usersModel({
       name,
       email,
-      password: hashPassword,
+      password: hashedPassword,
     });
 
     // Save the user to the database
@@ -50,7 +50,14 @@ export class AuthService {
 
     const user = await this.usersModel.findOne({ email });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    //Compare Password
+    if (
+      !user ||
+      !(await this.passwordHashingService.comparePassword(
+        password,
+        user.password,
+      ))
+    ) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
