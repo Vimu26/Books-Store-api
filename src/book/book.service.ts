@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Book } from 'src/schemas/book.schema';
+import { Book } from 'src/book/schemas/book.schema';
 import { BooksDto } from './dtos/books.dto';
+
+import { Query } from 'express-serve-static-core';
 
 @Injectable()
 export class BookService {
@@ -13,8 +15,23 @@ export class BookService {
     return newBook.save();
   }
 
-  async getAll(): Promise<Book[]> {
-    return this.booksModel.find().exec();
+  async getAll(query: Query): Promise<Book[]> {
+    const responsePerPage = 1;
+    const currentPage = Number(query.page) || 1;
+    const skip = responsePerPage * (currentPage - 1);
+    const keyWord = query.keyWord
+      ? {
+          title: {
+            $regex: query.keyWord,
+            $options: 'i',
+          },
+        }
+      : {};
+    return this.booksModel
+      .find({ ...keyWord })
+      .limit(responsePerPage)
+      .skip(skip)
+      .exec();
   }
 
   async getById(bookId: string): Promise<Book> {
