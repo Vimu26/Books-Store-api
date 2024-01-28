@@ -7,7 +7,7 @@ import { LoginDto } from '../dtos/login.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('/signup')
+  @Post('/register')
   async signUp(@Body() requestBody: SignUpDto): Promise<{ user: SignUpDto }> {
     return await this.authService.signUp(requestBody);
   }

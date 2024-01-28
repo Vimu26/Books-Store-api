@@ -9,13 +9,15 @@ import { Book } from 'src/book/schemas/book.schema';
 import { CreateBooksDto } from './dtos/createBooks.dto';
 
 import { Query } from 'express-serve-static-core';
+import { User } from 'src/auth/schemas/user.schema';
 
 @Injectable()
 export class BookService {
   constructor(@InjectModel(Book.name) private booksModel: Model<Book>) {}
 
-  async createBook(books: CreateBooksDto): Promise<Book> {
-    const newBook = new this.booksModel(books);
+  async createBook(books: CreateBooksDto, user: User): Promise<Book> {
+    const data = Object.assign(books, { user: user._id });
+    const newBook = new this.booksModel(data);
     return newBook.save();
   }
 
