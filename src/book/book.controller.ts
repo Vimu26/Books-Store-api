@@ -10,9 +10,10 @@ import {
 } from '@nestjs/common';
 import { Book } from 'src/book/schemas/book.schema';
 import { BookService } from './book.service';
-import { BooksDto } from './dtos/books.dto';
+import { CreateBooksDto } from './dtos/createBooks.dto';
 
 import { Query as ExpressQuery } from 'express-serve-static-core';
+import { UpdateBooksDto } from './dtos/updateBook.dto';
 
 @Controller('books')
 export class BookController {
@@ -29,14 +30,14 @@ export class BookController {
   }
 
   @Post()
-  async create(@Body() requestBody: BooksDto): Promise<Book> {
+  async create(@Body() requestBody: CreateBooksDto): Promise<Book> {
     return await this.booksService.createBook(requestBody);
   }
 
   @Patch(':id')
   async updateBook(
     @Param('id') bookId: string,
-    @Body() requestBody: BooksDto,
+    @Body() requestBody: UpdateBooksDto,
   ): Promise<Book> {
     return this.booksService.updateBook(bookId, requestBody);
   }
