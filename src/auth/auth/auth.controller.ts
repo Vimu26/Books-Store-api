@@ -3,7 +3,7 @@ import { SignUpDto } from '../dtos/signUp.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from '../dtos/login.dto';
 
-@Controller('auth')
+@Controller('oauth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
